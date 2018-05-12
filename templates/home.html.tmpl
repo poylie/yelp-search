@@ -1,10 +1,77 @@
 {{define "content"}}
-<div class="container">
-  <div class="row">
-    <div class="jumbotron">
-      <h1>Hello, World!</h1>
-      <p>Welcome to your new Go web project.</p>
-    </div>
-  </div>
-</div>
+    <main role="main">
+
+      <!-- Main jumbotron for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <div class="container">
+        <form action="/search" method="post">
+          <div class="row search-bar form-group">
+          
+            <div class="col-sm-5">
+                <div id="custom-search-input">
+                    <div class="input-group col-md-12">
+                        <input type="text" name="keyword" class="form-control input-lg" placeholder="Keyword" {{if .Keyword }} value={{.Keyword}} {{end}}/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-5">
+                <div id="custom-search-input">
+                    <div class="input-group col-md-12">
+                        <input type="text" name="location" class="form-control input-lg" placeholder="Location" {{if .Location }} value={{.Location}} {{end}}/>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-2">
+              <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-search fa-sm"></i> Search</button>
+            </div>
+          </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="container">
+        <!-- Example row of columns -->
+        <div class="row">
+
+            {{range .Business}}
+            <div class="col-sm-3 mb-3 p-2">
+                <div class="card">
+                <img class="card-img-top" src="{{.ImageURL}}" alt="{{.Alias}}" style="height: 10rem;">
+                    <div class="card-body">
+                        <a href={{.URL}} style="text-decoration: none;">
+                        <h5 class="card-title">{{.Name}}</h5>
+                        </a>
+                            <p class="card-text">
+                            {{with .Location -}}
+                                {{range .DisplayAddress}}
+                                    {{.}}<br /> 
+                                {{end}}
+                            {{- end}}
+                            </p>
+                            </div>
+                            <ul class="list-group list-group-flush">
+                                {{if .Rating }}
+                                <li class="list-group-item">{{.Rating}}</li>
+                                {{end}}
+                                {{if .Price }}
+                                <li class="list-group-item">{{.Price}}</li>
+                                {{end}}
+                            </ul>
+                            
+                        <div class="card-body">
+                        {{with .Coordinates -}}
+                            <a href="http://maps.google.com/maps?q={{.Latitude}},{{.Longitude}}" class="btn btn-primary"><i class="fas fa-map fa-sm"></i> Get Directions</a>
+                        {{- end}}
+                    </div>
+                </div>
+            </div>
+
+            {{end}}
+        </div>
+
+        <hr>
+
+      </div> <!-- /container -->
+
+    </main>
 {{end}}

@@ -1,11 +1,13 @@
 package handlers
 
 import (
-	"github.com/poylie/yelp-search/libhttp"
 	"html/template"
 	"net/http"
+
+	"github.com/poylie/yelp-search/libhttp"
 )
 
+// GetHome handler
 func GetHome(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html")
 
