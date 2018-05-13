@@ -7,19 +7,33 @@
         <form action="/search" method="post">
           <div class="row search-bar form-group">
           
-            <div class="col-sm-5">
+            <div class="col-sm-4">
                 <div id="custom-search-input">
                     <div class="input-group col-md-12">
                         <input type="text" name="keyword" class="form-control input-lg" placeholder="Keyword" {{if .Keyword }} value={{.Keyword}} {{end}}/>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-5">
+            <div class="col-sm-4">
                 <div id="custom-search-input">
                     <div class="input-group col-md-12">
                         <input type="text" name="location" class="form-control input-lg" placeholder="Location" {{if .Location }} value={{.Location}} {{end}}/>
                     </div>
                 </div>
+            </div>
+            <div class="col-sm-2">
+                <div id="custom-search-input">
+                    <div class="input-group">
+                        <select class="form-control input-lg">
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        </select>
+                    </div>
+                </div>
+
             </div>
             <div class="col-sm-2">
               <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-search fa-sm"></i> Search</button>
@@ -50,11 +64,17 @@
                             </p>
                             </div>
                             <ul class="list-group list-group-flush">
-                                {{if .Rating }}
-                                <li class="list-group-item">{{.Rating}}</li>
+                                {{if .RatingDisplay }}
+                                <li class="list-group-item">
+                                {{range .RatingDisplay}}<i class="fas fa-star fa-sm"></i>{{end}}
+                                {{if .RatingHalf}}<i class="fas fa-star-half fa-sm"></i>{{end}}
+                                </li>
                                 {{end}}
                                 {{if .Price }}
                                 <li class="list-group-item">{{.Price}}</li>
+                                {{end}}
+                                {{if .ReviewCount }}
+                                <li class="list-group-item"><h6>Review Count: {{.ReviewCount}}</h6></li>
                                 {{end}}
                             </ul>
                             
