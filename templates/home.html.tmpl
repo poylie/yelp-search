@@ -24,16 +24,23 @@
             <div class="col-sm-2">
                 <div id="custom-search-input">
                     <div class="input-group">
-                        <select class="form-control input-lg">
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
+                    {{if .SortMap}}
+                    <select name="sortBy" class="form-control input-lg">
+                        {{range $key, $value := .SortMap}}
+                        <option value="{{$key}}"{{if $value.Selected}} selected{{end}}>{{$value.SortDisplay}}</option>
+                        {{end}}
+                    </select>
+                    {{else}}
+                        <select name="sortBy" class="form-control input-lg">
+                        <option value="" selected disabled>Sort By</option>
+                        <option value="best_match">Relevance</option>
+                        <option value="rating">Rating</option>
+                        <option value="review_count">Review Count</option>
                         </select>
+                    {{end}}
+
                     </div>
                 </div>
-
             </div>
             <div class="col-sm-2">
               <button type="submit" class="btn btn-primary btn-block"><i class="fas fa-search fa-sm"></i> Search</button>

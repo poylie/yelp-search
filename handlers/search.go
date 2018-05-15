@@ -19,6 +19,13 @@ type Response struct {
 	Keyword  string
 	Location string
 	SortBy   string
+	SortMap  map[string]SortSelection
+}
+
+// Sort Selection struct
+type SortSelection struct {
+	SortDisplay string
+	Selected    bool
 }
 
 // Business struct for each business
@@ -64,7 +71,7 @@ func GetSearch(responseWriter http.ResponseWriter, request *http.Request) {
 	// get value from search
 	keyword := request.FormValue("keyword")
 	location := request.FormValue("location")
-	sortBy := "best_match"
+	sortBy := request.FormValue("sortBy")
 
 	client := &http.Client{}
 	yelpRequest, _ := http.NewRequest("GET", "https://api.yelp.com/v3/businesses/search", nil)
@@ -93,20 +100,33 @@ func GetSearch(responseWriter http.ResponseWriter, request *http.Request) {
 
 	if err != nil {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
+		libhttp.HandleErrorJson(responseWriter, err)
 	} else {
 		data, _ := ioutil.ReadAll(response.Body)
-
 		json.Unmarshal(data, &responseObject)
-	}
-
-	if err != nil {
-		libhttp.HandleErrorJson(responseWriter, err)
-		return
 	}
 
 	responseObject.Location = location
 	responseObject.Keyword = keyword
+	responseObject.SortBy = sortBy
+	tempMap := map[string]string{
+		"":             "Sort By",
+		"best_match":   "Relevance",
+		"rating":       "Rating",
+		"review_count": "Review Count",
+	}
 
+	responseObject.SortMap = make(map[string]SortSelection)
+
+	for key, value := range tempMap {
+		if key == sortBy {
+			responseObject.SortMap[key] = SortSelection{value, true}
+		} else {
+			responseObject.SortMap[key] = SortSelection{value, false}
+		}
+	}
+
+	// This section is for the star rating display
 	for elementIndex, element := range responseObject.Business {
 		for idx := 0; idx < int(element.Rating); idx++ {
 			if element.RatingDisplay == nil {
