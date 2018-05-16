@@ -8,64 +8,29 @@ import (
 	"math"
 	"net/http"
 
+	"github.com/poylie/yelp-search/handlers/structs"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/poylie/yelp-search/libhttp"
 )
-
-// Response is the entire body of the YELP API Response
-type Response struct {
-	Business []Business `json:"businesses"`
-	Total    int        `json:"total"`
-	Keyword  string
-	Location string
-	SortBy   string
-	SortMap  map[string]SortSelection
-}
-
-// Sort Selection struct
-type SortSelection struct {
-	SortDisplay string
-	Selected    bool
-}
-
-// Business struct for each business
-type Business struct {
-	Name          string   `json:"name"`
-	Alias         string   `json:"alias"`
-	Location      Location `json:"location"`
-	Price         string   `json:"price"`
-	Rating        float64  `json:"rating"`
-	RatingDisplay []bool
-	RatingHalf    bool
-	ReviewCount   int         `json:"review_count"`
-	URL           string      `json:"url"`
-	ImageURL      string      `json:"image_url"`
-	Coordinates   Coordinates `json:"coordinates"`
-}
-
-// Coordinates struct
-type Coordinates struct {
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
-}
-
-// Location holds address of business
-type Location struct {
-	Address1       string   `json:"address1"`
-	Address2       string   `json:"address2"`
-	Address3       string   `json:"address3"`
-	City           string   `json:"city"`
-	ZipCode        string   `json:"zip_code"`
-	Country        string   `json:"country"`
-	State          string   `json:"state"`
-	DisplayAddress []string `json:"display_address"`
-}
 
 // GetSearch handler
 func GetSearch(responseWriter http.ResponseWriter, request *http.Request) {
 	responseWriter.Header().Set("Content-Type", "text/html")
 
-	tmpl, err := template.ParseFiles("templates/dashboard.html.tmpl", "templates/home.html.tmpl")
+	tmpl, _ := template.ParseFiles("templates/dashboard.html.tmpl", "templates/home.html.tmpl")
+
+	responseObject := GetResult(responseWriter, request)
+
+	responseObject = ProcessSortList(responseObject)
+	responseObject = ProcessRating(responseObject)
+
+	tmpl.Execute(responseWriter, responseObject)
+}
+
+// GetResult func to get result from API
+func GetResult(responseWriter http.ResponseWriter, request *http.Request) structs.Response {
+	var responseObject structs.Response
 
 	request.ParseForm()
 	// get value from search
@@ -96,8 +61,6 @@ func GetSearch(responseWriter http.ResponseWriter, request *http.Request) {
 	logrus.Infof("Request: %s\n", yelpRequest.URL)
 	response, err := client.Do(yelpRequest)
 
-	var responseObject Response
-
 	if err != nil {
 		fmt.Printf("The HTTP request failed with error %s\n", err)
 		libhttp.HandleErrorJson(responseWriter, err)
@@ -109,6 +72,12 @@ func GetSearch(responseWriter http.ResponseWriter, request *http.Request) {
 	responseObject.Location = location
 	responseObject.Keyword = keyword
 	responseObject.SortBy = sortBy
+
+	return responseObject
+}
+
+// ProcessSortList to identify which sort type was selected
+func ProcessSortList(response structs.Response) structs.Response {
 	tempMap := map[string]string{
 		"":             "Sort By",
 		"best_match":   "Relevance",
@@ -116,18 +85,22 @@ func GetSearch(responseWriter http.ResponseWriter, request *http.Request) {
 		"review_count": "Review Count",
 	}
 
-	responseObject.SortMap = make(map[string]SortSelection)
+	response.SortMap = make(map[string]structs.SortSelection)
 
 	for key, value := range tempMap {
-		if key == sortBy {
-			responseObject.SortMap[key] = SortSelection{value, true}
+		if key == response.SortBy {
+			response.SortMap[key] = structs.SortSelection{value, true}
 		} else {
-			responseObject.SortMap[key] = SortSelection{value, false}
+			response.SortMap[key] = structs.SortSelection{value, false}
 		}
 	}
+	return response
+}
 
+// ProcessRating process display of rating
+func ProcessRating(response structs.Response) structs.Response {
 	// This section is for the star rating display
-	for elementIndex, element := range responseObject.Business {
+	for elementIndex, element := range response.Business {
 		for idx := 0; idx < int(element.Rating); idx++ {
 			if element.RatingDisplay == nil {
 				element.RatingDisplay = []bool{true}
@@ -140,8 +113,8 @@ func GetSearch(responseWriter http.ResponseWriter, request *http.Request) {
 			element.RatingHalf = true
 		}
 
-		responseObject.Business[elementIndex] = element
+		response.Business[elementIndex] = element
 	}
 
-	tmpl.Execute(responseWriter, responseObject)
+	return response
 }
