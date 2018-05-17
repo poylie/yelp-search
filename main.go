@@ -1,11 +1,13 @@
 package main
 
 import (
+	"net/http"
+	"os"
+	"time"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/tylerb/graceful"
-	"net/http"
-	"time"
 
 	"github.com/poylie/yelp-search/application"
 )
@@ -13,7 +15,7 @@ import (
 func newConfig() (*viper.Viper, error) {
 	c := viper.New()
 	c.SetDefault("cookie_secret", "Z3plbbWvm3N1NZtW")
-	c.SetDefault("http_addr", ":8888")
+	c.SetDefault("http_addr", ":"+os.Getenv("PORT"))
 	c.SetDefault("http_cert_file", "")
 	c.SetDefault("http_key_file", "")
 	c.SetDefault("http_drain_interval", "1s")
