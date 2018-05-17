@@ -15,7 +15,13 @@ import (
 func newConfig() (*viper.Viper, error) {
 	c := viper.New()
 	c.SetDefault("cookie_secret", "Z3plbbWvm3N1NZtW")
-	c.SetDefault("http_addr", ":"+os.Getenv("PORT"))
+
+	if os.Getenv("PORT") == "" {
+		c.SetDefault("http_addr", ":8888")
+	} else {
+		c.SetDefault("http_addr", ":"+os.Getenv("PORT"))
+	}
+
 	c.SetDefault("http_cert_file", "")
 	c.SetDefault("http_key_file", "")
 	c.SetDefault("http_drain_interval", "1s")
