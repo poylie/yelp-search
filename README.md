@@ -1,3 +1,9 @@
+## Description
+
+* simple web app that would connect to Yelp API for simple keyword and location queries.
+* sorting by 3 options of Relevance, Rating, and Review Count
+* redirected to google maps for directions
+
 ## Installation
 
 1. Install Go 1.4.x or greater, git, setup `$GOPATH`, and `PATH=$PATH:$GOPATH/bin`
