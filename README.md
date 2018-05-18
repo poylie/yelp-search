@@ -6,11 +6,10 @@
 
 ## Deployed
 
-```
+
 Currently deployed in heroku.
 
 [Try the app](https://yelp-dbs-search.herokuapp.com/)
-```
 
 ## Installation
 
