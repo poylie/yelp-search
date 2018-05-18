@@ -4,6 +4,14 @@
 * sorting by 3 options of Relevance, Rating, and Review Count
 * redirected to google maps for directions
 
+## Deployed
+
+```
+Currently deployed in heroku.
+
+[Try the app](https://yelp-dbs-search.herokuapp.com/)
+```
+
 ## Installation
 
 1. Install Go 1.4.x or greater, git, setup `$GOPATH`, and `PATH=$PATH:$GOPATH/bin`
